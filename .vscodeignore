@@ -1,11 +1,12 @@
-**/*.map
 .gitignore
+.vscode
 .vscode-test/**
 .vscode/**
-out/test/**
-resources/*.gif
+# **/*.map
+node_modules
+out/
 resources/*.psd
-src/**
-test/**
+src/
+test/
 tsconfig.json
-webpack.config.js
+webpack.config.*
