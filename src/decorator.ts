@@ -1,3 +1,16 @@
+/**
+ * TODO: `vscode.TextEditor.id`?
+ * TODO: Refine types on properties of `Decorator`, and consider migrating to class with proper
+ *       initialization instead of using assertions to calm typechecker
+ */
+
+/* DECLARATIONS */
+
+type EditorId = number | string;
+interface TextEditorWithId extends vscode.TextEditor
+{
+    id: EditorId
+}
 
 /* IMPORT */
 
@@ -5,6 +18,11 @@ import * as _ from 'lodash';
 import stringMatches from 'string-matches';
 import * as vscode from 'vscode';
 import Config from './config';
+import type {
+  Configuration,
+  HighlightDecoration,
+  HighlightRegexConfiguration
+} from './config';
 import Utils from './utils';
 
 /* DECORATOR */
@@ -23,18 +41,18 @@ const Decorator = {
 
   /* CONFIG */
 
-  config: undefined,
+  config: undefined! as Configuration,
 
   initConfig () {
 
-    Decorator.config = Config.get ();
+    Decorator.config = Config.get ()!;
 
   },
 
   /* REGEXES */
 
-  regexesStrs: undefined,
-  regexes: undefined,
+  regexesStrs: undefined! as string[],
+  regexes: undefined! as _.Dictionary<RegExp>,
 
   initRegexes () {
 
@@ -52,7 +70,7 @@ const Decorator = {
 
   },
 
-  getRegex ( reStr ) {
+  getRegex ( reStr: string ) {
 
     return Decorator.regexes[reStr];
 
@@ -60,8 +78,8 @@ const Decorator = {
 
   /* TYPES */
 
-  types: undefined,
-  typesDynamic: [],
+  types: [] as _.Dictionary<any>,
+  typesDynamic: [] as vscode.TextEditorDecorationType[],
 
   initTypes () {
 
@@ -79,8 +97,7 @@ const Decorator = {
                     decorationsStr = JSON.stringify ( decorationsFull );
 
               if ( /\$\d/.test ( decorationsStr ) ) { // Dynamic decorator
-
-                return _.memoize<any> ( match => {
+                const regexExecToDecorationMemoizer = (match: RegExpExecArray) => {
 
                   const decorationsStrReplaced = decorationsStr.replace ( /\$(\d)/g, ( m, index ) => match[index] ),
                         decorationsFullReplaced = JSON.parse ( decorationsStrReplaced );
@@ -91,7 +108,9 @@ const Decorator = {
 
                   return type;
 
-                }, match => match[0] );
+                }
+
+                return _.memoize ( regexExecToDecorationMemoizer, match => match[0] );
 
               } else { // Static decorator
 
@@ -107,13 +126,13 @@ const Decorator = {
 
   },
 
-  getTypes ( reStr ) {
+  getTypes ( reStr: string ) {
 
     return Decorator.types[reStr];
 
   },
 
-  getType ( reStr, matchNr = 0 ) {
+  getType ( reStr: string, matchNr = 0 ) {
 
     return Decorator.getTypes ( reStr )[matchNr];
 
@@ -121,9 +140,10 @@ const Decorator = {
 
   /* DECORATIONS */
 
-  decorations: {}, // Map of document id => decorations
+  decorations: {} as Map<EditorId, Configuration>, // Map of document id => decorations
 
-  decorate ( target?: vscode.TextEditor | vscode.TextDocument, force?: boolean ) {
+  decorate ( target?: vscode.TextEditor | vscode.TextDocument, force?: boolean ) : void
+  {
 
     if ( !target ) {
 
@@ -143,7 +163,7 @@ const Decorator = {
 
     }
 
-    const textEditor = target,
+    const textEditor = target as TextEditorWithId,
           doc = target.document,
           text = doc.getText (),
           decorations = new Map ();
@@ -200,10 +220,26 @@ const Decorator = {
 
     /* CLEARING */
 
+    /**
+     * @TODO Shouldn't this need a get?
+     */
+    // @ts-expect-error ts(7052) Element implicitly has an 'any' type because type 'Map<EditorId, Configuration>' has no index signature. Did you mean to call 'Decorator.decorations.get'?
     const prevDecorations = Decorator.decorations[textEditor['id']];
 
-    if ( force !== true && ( ( ( !prevDecorations || !prevDecorations.size ) && !decorations.size ) || ( prevLineCount === doc.lineCount && _.isEqual ( prevDecorations, decorations ) ) ) ) return; // Nothing changed, skipping unnecessary work //URL: https://github.com/Microsoft/vscode/issues/50415
+    if ( force !== true
+          && (
+              (
+                ( !prevDecorations || !prevDecorations.size )
+                && !decorations.size
+              ) || (
+                prevLineCount === doc.lineCount
+                && _.isEqual ( prevDecorations, decorations )
+              )
+            )
+        )
+        return; // Nothing changed, skipping unnecessary work //URL: https://github.com/Microsoft/vscode/issues/50415
 
+    // @ts-expect-error ts(7052) Element implicitly has an 'any' type because type 'Map<EditorId, Configuration>' has no index signature. Did you mean to call 'Decorator.decorations.set'?
     Decorator.decorations[textEditor['id']] = decorations;
 
     Decorator.undecorate ();
@@ -218,7 +254,7 @@ const Decorator = {
 
   },
 
-  docsLines: {},
+  docsLines: {} as Record<EditorId, number>,
 
   decorateLines ( doc: vscode.TextDocument, lineNrs: number[] ) {
 
@@ -227,11 +263,12 @@ const Decorator = {
     // 2. There were no decorations in lineNrs
     // 3. There still are no decorations in lineNrs
 
-    const textEditor = Utils.document.getEditors ( doc )[0];
+    const textEditor = Utils.document.getEditors ( doc )[0] as TextEditorWithId;
 
     if ( textEditor && Decorator.docsLines[textEditor['id']] === doc.lineCount ) {
 
-      const decorations = Decorator.decorations[textEditor['id']];
+      // @ts-expect-error ts(7052) Element implicitly has an 'any' type because type 'Map<EditorId, Configuration>' has no index signature. Did you mean to call 'Decorator.decorations.get'?
+      const decorations = Decorator.decorations[textEditor['id']] as HighlightRegexConfiguration['decorations'][]
 
       let hadDecorations = false;
 
@@ -239,7 +276,7 @@ const Decorator = {
 
         for ( let ranges of decorations.values () ) {
 
-          if ( ranges.find ( range => _.includes ( lineNrs, range.start.line ) || _.includes ( lineNrs, range.end.line ) ) ) {
+          if ( ranges!.find ( range => _.includes ( lineNrs, range.start.line ) || _.includes ( lineNrs, range.end.line ) ) ) {
 
             hadDecorations = true;
 
@@ -278,7 +315,7 @@ const Decorator = {
 
   },
 
-  undecorate ( textEditor: vscode.TextEditor = vscode.window.activeTextEditor ) {
+  undecorate ( textEditor: vscode.TextEditor = vscode.window.activeTextEditor! ) {
 
     if ( !textEditor ) return;
 

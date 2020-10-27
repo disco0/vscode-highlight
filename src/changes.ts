@@ -2,15 +2,26 @@
 /* IMPORT */
 
 import * as vscode from 'vscode';
+import type {
+    Range,
+    TextDocumentContentChangeEvent,
+    TextDocumentChangeEvent
+} from 'vscode'
 import Decorator from './decorator';
+
+//#region Declarations
+
+//#endregion Declarations
 
 /* CHANGES */
 
-const Changes = {
+export const Changes =
 
-  changes: [],
+{
 
-  onChanges ({ document, contentChanges }) {
+  changes: [] as TextDocumentContentChangeEvent[],
+
+  onChanges ({ document, contentChanges }: TextDocumentChangeEvent) {
 
     if ( !contentChanges.length ) return; //URL: https://github.com/Microsoft/vscode/issues/50344
 

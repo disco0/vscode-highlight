@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES2019",
+    "outDir": "../out",
+    "sourceMap": true,
+    "rootDir": ".",
+    "baseUrl": "./",
+    "strict": true,
+    "strictNullChecks": true,
+
+    /**
+     * Per advice under `If you are using TypeScript >= 3.8.0` at
+     * <https://www.npmjs.com/package/fork-ts-checker-webpack-plugin>
+     */
+    "importsNotUsedAsValues": "preserve",
+
+    "lib":
+    [
+      "ES2019.Array"
+    ],
+
+    "typeRoots": [
+      "../node_modules/@types"
+    ]
+  }
+}
