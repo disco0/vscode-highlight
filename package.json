@@ -3,10 +3,10 @@
   "displayName": "Highlight",
   "description": "Advanced text highlighter based on regexes. Useful for todos, annotations, colors etc.",
   "icon": "resources/logo-128x128.png",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "license": "MIT",
-  "main": "out/extension.js",
-  "publisher": "fabiospampinato",
+  "main": "dist/extension.js",
+  "publisher": "disk0",
   "activationEvents": [
     "*"
   ],
@@ -41,12 +41,15 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "rm -rf out && webpack --mode production",
+    "vscode:prepublish": "rm -rf out && yarn compile:release",
     "publish": "vsce publish && npm publish",
-    "compile": "webpack --mode development",
-    "compile:watch": "webpack --mode development --watch",
-    "postinstall": "node ./node_modules/vscode/bin/install",
-    "test": "node ./node_modules/vscode/bin/test"
+    "compile": "yarn webpack:command:base --mode development --progress",
+    "compile:watch": "yarn webpack:command:base --mode development --watch  --progress",
+    "compile:release": "yarn webpack:command:base --mode production --progress",
+    "compile:watch:release": "yarn webpack:command:base --mode production --watch --progress",
+    "test": "node ./node_modules/vscode/bin/test",
+    "webpack:command:base": "cross-env TS_NODE_PROJECT=\"tsconfig.webpack.json\" webpack",
+    "build:vsix": "cross-env VSIX_DIR=./build vsce package --out \"${VSIX_DIR}/$(jq .name ./package.json --raw-output)-$(jq .version ./package.json --raw-output).vsix\""
   },
   "bugs": {
     "url": "https://github.com/fabiospampinato/vscode-highlight/issues"
@@ -75,16 +78,21 @@
     "Other"
   ],
   "dependencies": {
-    "@types/node": "^10.12.8",
-    "lodash": "^4.17.4",
-    "pify": "^3.0.0",
-    "string-matches": "^1.1.0"
+    "lodash": "^4.17.20",
+    "pify": "^5.0.0",
+    "string-matches": "^1.1.3"
   },
   "devDependencies": {
-    "ts-loader": "^5.2.1",
-    "typescript": "~2.4.1",
-    "vscode": "^1.1.4",
-    "webpack": "^4.20.2",
-    "webpack-cli": "^3.1.2"
+    "@types/lodash": "^4.14.162",
+    "@types/node": "^14.14.5",
+    "@types/vscode": "1.15.0",
+    "@types/webpack": "^4.41.23",
+    "fork-ts-checker-webpack-plugin": "^5.2.0",
+    "ts-loader": "^8.0.7",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.5",
+    "vscode-test": "^1.4.1",
+    "webpack": "^5.2.0",
+    "webpack-cli": "^4.1.0"
   }
 }
