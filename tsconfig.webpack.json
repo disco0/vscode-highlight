@@ -1,0 +1,19 @@
+{
+  "files":
+  [
+      "./webpack.config.ts"
+  ],
+  "exclude":
+  [
+     "./src",
+     "./dist",
+     "./node_modules"
+  ],
+  "compilerOptions": {
+    "checkJs": false,
+    "module": "commonjs",
+    "target": "es5",
+    "esModuleInterop": true,
+    "typeRoots": ["./node_modules/@types"]
+  }
+}
