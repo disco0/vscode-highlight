@@ -13,7 +13,6 @@ const primativeToString: typeof Object.prototype.toString =
             // @ts-expect-error
             return ({})[propName].toString;
 })(['__proto__', 'prototype'] as const);
-console.log(primativeToString)
 
 export function isFunction<F extends (...args: any[]) => any>(obj: unknown): obj is F
 {
