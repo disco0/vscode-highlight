@@ -1,0 +1,32 @@
+{
+    "configurations": [
+    {
+      "name": "Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [ "--extensionDevelopmentPath=${workspaceFolder}" ],
+      "outFiles": [ "${workspaceFolder}/dist/**/*.js" ],
+      "presentation": {
+        "hidden": false,
+        "group": "start",
+        "order": 1
+      },
+      "preLaunchTask": "compile"
+    },
+    {
+      "name": "Extension - Release",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [ "--extensionDevelopmentPath=${workspaceFolder}" ],
+      "outFiles": [ "${workspaceFolder}/dist/**/*.js" ],
+      "presentation": {
+        "hidden": false,
+        "group": "start",
+        "order": 1
+      },
+      "preLaunchTask": "compile:release"
+    },
+  ]
+}
