@@ -5,7 +5,13 @@
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
-      "args": [ "--extensionDevelopmentPath=${workspaceFolder}" ],
+      "args": [
+          // Disable installed versions of extension
+          "--disable-extension=disk0.vscode-highlight",
+          "--disable-extension=fabiospampinato.vscode-highlight",
+
+          "--extensionDevelopmentPath=${workspaceFolder}",
+      ],
       "outFiles": [ "${workspaceFolder}/dist/**/*.js" ],
       "presentation": {
         "hidden": false,
@@ -19,7 +25,13 @@
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
-      "args": [ "--extensionDevelopmentPath=${workspaceFolder}" ],
+      "args": [
+          // Disable installed versions of extension
+          "--disable-extension=disk0.vscode-highlight",
+          "--disable-extension=fabiospampinato.vscode-highlight",
+
+          "--extensionDevelopmentPath=${workspaceFolder}",
+      ],
       "outFiles": [ "${workspaceFolder}/dist/**/*.js" ],
       "presentation": {
         "hidden": false,
