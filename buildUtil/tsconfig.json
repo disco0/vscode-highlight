@@ -1,0 +1,19 @@
+{
+  "extends": "../tsconfig.ts-node.base.json",
+  "include":
+  [
+      "../schema.d.ts",
+      "./*.*"
+  ],
+  "exclude":
+  [
+     "../src",
+     "../dist",
+  ],
+  "compilerOptions":
+  {
+    "skipLibCheck": true,
+    "moduleResolution": "Node",
+    "module": "commonjs",
+  }
+}
