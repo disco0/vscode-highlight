@@ -2673,6 +2673,7 @@
         "compile:release": "yarn webpack:command:base --mode production",
         "compile:release:watch": "yarn compile:release --watch",
         "test": "node ./node_modules/vscode/bin/test",
+        "schema:update": "cross-env TS_NODE_PROJECT=\"./buildUtil/tsconfig.json\" ts-node ./buildUtil/updateConfigurationSchema.ts",
         "build:vsix": "cross-env VSIX_DIR=./package vsce package --out \"${VSIX_DIR}/$(jq .name ./package.json --raw-output)-$(jq .version ./package.json --raw-output).vsix\""
     },
     "bugs": {
