@@ -15,6 +15,14 @@
             "type": "object",
             "title": "Highlight - Configuration",
             "properties": {
+                "highlight.configPath": {
+                    "type": "string",
+                    "description": "Path to external extension configuration file.",
+                    "title": "Configuration file path",
+                    "examples": [
+                        "~/.highlight.config.json"
+                    ]
+                },
                 "highlight.decorations": {
                     "type": "object",
                     "description": "Default decorations from which all others inherit from",
@@ -2658,22 +2666,21 @@
         }
     },
     "scripts": {
-        "clean": "rimraf dist",
-        "env:vsix:package-dir": "cross-env PACKAGE_OUT_DIR=\"${INIT_CWD}/package\"",
-        "vsix": "yarn env:vsix:package-dir yarn vsix:command",
-        "vsix:command": "vsce package --yarn --out  \"$PACKAGE_OUT_DIR/$(jq .name ./package.json --raw-output)-$(jq .version ./package.json --raw-output).vsix\"",
-        "vscode:prepublish": "rm -rf out && yarn compile:release",
-        "publish": "vsce publish && npm publish",
         "webpack:command:base": "cross-env TS_NODE_PROJECT=\"webpack/tsconfig.json\" webpack --config webpack/webpack.config.ts --progress",
-        "webpack:command:dev-server": "cross-env TS_NODE_PROJECT=\"webpack/tsconfig.json\" webpack-dev-server --config webpack/webpack.config.ts --progress",
-        "compile": "yarn webpack:command:base --mode development",
-        "compile:watch": "yarn compile --watch",
+        "compile": "yarn run webpack:command:base --mode development",
+        "compile:watch": "yarn run compile --watch",
         "compile:clean": "yarn clean && yarn compile",
         "compile:clean:watch": "yarn compile:clean --watch",
         "compile:release": "yarn webpack:command:base --mode production",
         "compile:release:watch": "yarn compile:release --watch",
-        "test": "node ./node_modules/vscode/bin/test",
         "schema:update": "cross-env TS_NODE_PROJECT=\"./buildUtil/tsconfig.json\" ts-node ./buildUtil/updateConfigurationSchema.ts",
+        "test": "node ./node_modules/vscode/bin/test",
+        "clean": "rimraf dist",
+        "env:vsix:package-dir": "cross-env PACKAGE_OUT_DIR=\"${INIT_CWD}/package\"",
+        "vsix": "yarn run env:vsix:package-dir yarn vsix:command",
+        "vsix:command": "vsce package --yarn --out  \"$PACKAGE_OUT_DIR/$(jq .name ./package.json --raw-output)-$(jq .version ./package.json --raw-output).vsix\"",
+        "vscode:prepublish": "yarn clean && yarn compile:release",
+        "publish": "vsce publish && npm publish",
         "build:vsix": "cross-env VSIX_DIR=./package vsce package --out \"${VSIX_DIR}/$(jq .name ./package.json --raw-output)-$(jq .version ./package.json --raw-output).vsix\""
     },
     "bugs": {
@@ -2709,19 +2716,14 @@
     "devDependencies": {
         "@types/lodash": "^4.14.165",
         "@types/node": "^14.14.5",
-        "@types/pnpapi": "^0.0.1",
-        "@types/vscode": "1.15.0",
+        "@types/vscode": "1.40.0",
         "clean-webpack-plugin": "^3.0.0",
         "fork-ts-checker-webpack-plugin": "^6.0.7",
-        "pnp-webpack-plugin": "^1.6.4",
-        "pnpapi": "^0.0.0",
         "ts-loader": "^8.0.12",
         "ts-node": "^9.1.1",
-        "tsconfig-paths-webpack-plugin": "^3.3.0",
         "tsdef": "^0.0.14",
         "typescript": "next",
         "vscode-contribution-schema": "github:disco0/vscode-contribution-schema#master",
-        "vscode-test": "^1.4.1",
         "webpack": "^5.11.0",
         "webpack-cli": "^4.2.0"
     }
