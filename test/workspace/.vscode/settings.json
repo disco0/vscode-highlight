@@ -1,0 +1,11 @@
+{
+  // Test decorations
+  "highlight.regexes":
+  {
+      "aaaa": {
+      }
+  },
+  "[jsonc]": {
+    "editor.tabSize": 4
+  },
+}

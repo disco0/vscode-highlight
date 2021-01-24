@@ -39,15 +39,20 @@ export function isTextEditor ( x: unknown ): x is NonNullTextEditor
 
 export const is =
 {
-    function: isFunction,
-    string:   isString,
-    number:   isNumber,
-    regex:    isRegExp
+    function:   isFunction,
+    string:     isString,
+    number:     isNumber,
+    regex:      isRegExp,
+    textEditor: isTextEditor
 }
 
 /* DECLARTIONS */
 
-import type { Configuration, HighlightDecoration, HighlightRegexConfiguration } from './config'
+import type {
+    Configuration,
+    HighlightDecoration,
+    HighlightRegexConfiguration
+} from './config'
 
 type NonNull<T> = Exclude<T, null>;
 

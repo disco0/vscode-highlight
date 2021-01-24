@@ -10,9 +10,9 @@ import { resolve } from 'path'
 
 import type { MaybeUndefined as Maybe } from 'tsdef'
 
-import TsConfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
+import TerserPlugin from 'terser-webpack-plugin'
 
 import {
   CliConfigOptions,
@@ -49,6 +49,7 @@ const config: ConfigurationFactory = ((env, config) =>
     context,
     target: 'node',
     entry,
+
     output: {
       path: resolve(context, outDir),
       filename: 'extension.js',
@@ -56,6 +57,10 @@ const config: ConfigurationFactory = ((env, config) =>
       devtoolModuleFilenameTemplate: '../[resource-path]'
     },
     devtool: 'source-map',
+    optimization: {
+        minimize: (config?.mode ?? 'development') === 'production',
+
+    },
     externals:
     {
         // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
@@ -78,16 +83,19 @@ const config: ConfigurationFactory = ((env, config) =>
     },
     plugins: [
       ... forkChecker
-        ? [new ForkTsCheckerWebpackPlugin({ typescript: { configFile: tsConfigPath }})]
-        : [ ]
+        ? [new ForkTsCheckerWebpackPlugin({ typescript: { configFile: tsConfigPath }, formatter: 'basic', })]
+        : [ ],
+      new CleanWebpackPlugin({ verbose: true })
     ],
 
     infrastructureLogging:
     {
-      level: 'log'
+      level: 'verbose',
+
     },
     stats:
     {
+      logging: 'verbose',
       all: true
     }
   }

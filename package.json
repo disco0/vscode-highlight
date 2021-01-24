@@ -3,7 +3,7 @@
     "displayName": "Highlight",
     "description": "Advanced text highlighter based on regexes. Useful for todos, annotations, colors etc.",
     "icon": "resources/logo-128x128.png",
-    "version": "1.4.3",
+    "version": "1.4.2",
     "license": "MIT",
     "main": "dist/extension.js",
     "publisher": "disk0",
@@ -15,14 +15,6 @@
             "type": "object",
             "title": "Highlight - Configuration",
             "properties": {
-                "highlight.configPath": {
-                    "type": "string",
-                    "description": "Path to external extension configuration file.",
-                    "title": "Configuration file path",
-                    "examples": [
-                        "~/.highlight.config.json"
-                    ]
-                },
                 "highlight.decorations": {
                     "type": "object",
                     "description": "Default decorations from which all others inherit from",
@@ -1331,13 +1323,12 @@
                             "regexFlags": {
                                 "type": "string",
                                 "description": "Flags used when building regexes.",
-                                "pattern": "^((?:([gmiu])(?!.*\\2))*)$",
+                                "pattern": "^((?:([gmi])(?!.*\\2))*)$",
                                 "default": "gi",
                                 "examples": [
                                     "g",
                                     "gm",
                                     "gmi",
-                                    "u",
                                     "m",
                                     "mi",
                                     "i",
@@ -2643,14 +2634,12 @@
                 "highlight.regexFlags": {
                     "type": "string",
                     "description": "Flags used when building regexes.",
-                    "pattern": "^((?:([gmiu])(?!.*\\2))*)$",
+                    "pattern": "^((?:([gmi])(?!.*\\2))*)$",
                     "default": "gi",
                     "examples": [
                         "g",
                         "gm",
                         "gmi",
-                        "gmiu",
-                        "u",
                         "m",
                         "mi",
                         "i",
@@ -2667,19 +2656,18 @@
     },
     "scripts": {
         "webpack:command:base": "cross-env TS_NODE_PROJECT=\"webpack/tsconfig.json\" webpack --config webpack/webpack.config.ts --progress",
-        "compile": "yarn run webpack:command:base --mode development",
-        "compile:watch": "yarn run compile --watch",
-        "compile:clean": "yarn clean && yarn compile",
-        "compile:clean:watch": "yarn compile:clean --watch",
+        "compile:development": "yarn run webpack:command:base --mode development",
+        "compile": "yarn run compile:development",
+        "compile:watch": "yarn run compile --watch --infrastructure-logging-level verbose ",
         "compile:release": "yarn webpack:command:base --mode production",
-        "compile:release:watch": "yarn compile:release --watch",
+        "compile:release:watch": "yarn compile:release --watch --infrastructure-logging-level verbose",
         "schema:update": "cross-env TS_NODE_PROJECT=\"./buildUtil/tsconfig.json\" ts-node ./buildUtil/updateConfigurationSchema.ts",
         "test": "node ./node_modules/vscode/bin/test",
         "clean": "rimraf dist",
         "env:vsix:package-dir": "cross-env PACKAGE_OUT_DIR=\"${INIT_CWD}/package\"",
         "vsix": "yarn run env:vsix:package-dir yarn vsix:command",
         "vsix:command": "vsce package --yarn --out  \"$PACKAGE_OUT_DIR/$(jq .name ./package.json --raw-output)-$(jq .version ./package.json --raw-output).vsix\"",
-        "vscode:prepublish": "yarn clean && yarn compile:release",
+        "vscode:prepublish": "yarn compile:release",
         "publish": "vsce publish && npm publish",
         "build:vsix": "cross-env VSIX_DIR=./package vsce package --out \"${VSIX_DIR}/$(jq .name ./package.json --raw-output)-$(jq .version ./package.json --raw-output).vsix\""
     },
@@ -2720,11 +2708,13 @@
         "@types/vscode": "1.40.0",
         "clean-webpack-plugin": "^3.0.0",
         "fork-ts-checker-webpack-plugin": "^6.0.7",
+        "terser-webpack-plugin": "^5.0.3",
         "ts-loader": "^8.0.12",
         "ts-node": "^9.1.1",
         "tsdef": "^0.0.14",
         "typescript": "next",
         "vscode-contribution-schema": "github:disco0/vscode-contribution-schema#master",
+        "vscode-contribution-util": "file:../../../vscode-util/vscode-contribution-utils/",
         "webpack": "^5.11.0",
         "webpack-cli": "^4.2.0"
     }

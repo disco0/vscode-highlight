@@ -4,194 +4,221 @@
   "options":
   {
     "env": {
-      "PACKAGE_OUT_DIR": "${workspaceFolder}/build"
+      "PACKAGE_OUT_DIR": "${workspaceFolder}/package"
     }
   },
 	"tasks":
   [
-  {
-      "type": "npm",
-      "label": "watch",
-      "options":
-      {
-        "statusbar":
-        {
-          "label": "〈 Watch 〉",
-          "hide": false
-        }
-      },
-      "isBackground": true,
-      "runOptions": {
-          "runOn": "folderOpen"
-      },
-      "script": "compile:watch",
-      "problemMatcher": [
-          "$ts-webpack-watch",
-          "$tsc-watch",
-          // Best chance for preLaunchTask use to detect successful compilation
-          "$tslint-webpack-watch"
-      ],
-
-      "presentation": {
-          "reveal":           "never",
-          "clear":            false,
-          "echo":             true,
-          "focus":            false,
-          "group":            "build",
-          "panel":            "dedicated",
-          "revealProblems":   "never",
-          "showReuseMessage": false
-      },
-
-      "group": {
-          "kind": "build",
-          "isDefault": true
-      },
-  },
-  {
-      "type": "npm",
-      "label": "compile",
-      "options":
-      {
-        "statusbar":
-        {
-          "label": "〈 Build 〉",
-          "hide": false
-        }
-      },
-      "script": "compile",
-      "problemMatcher": [
-          "$tsc",
-          "$ts-webpack",
-      ],
-
-      "presentation": {
-          "reveal":           "never",
-          "clear":            false,
-          "echo":             true,
-          "focus":            false,
-          "group":            "build",
-          "panel":            "dedicated",
-          "revealProblems":   "never",
-          "showReuseMessage": false
-      },
-      "group": "build",
-  },
-  {
-      "type": "npm",
-      "label": "compile:release",
-      "options":
-      {
-        "statusbar":
-        {
-          "hide": true
-        }
-      },
-
-      "script": "compile:release",
-      "problemMatcher": [
-          "$tsc",
-          "$ts-webpack",
-      ],
-
-      "presentation": {
-          "reveal":           "never",
-          "clear":            false,
-          "echo":             true,
-          "focus":            false,
-          "group":            "build",
-          "panel":            "dedicated",
-          "revealProblems":   "never",
-          "showReuseMessage": false
-      },
-      "group": "build",
-  },
-  {
-      "type": "shell",
-      "label": "Build .vsix",
-      "command": "vsce package --out  \"${PACKAGE_OUT_DIR}/$(jq .name ./package.json --raw-output)-$(jq .version ./package.json --raw-output).vsix\"",
-      "problemMatcher": [
-          "$ts-webpack",
-          "$ts-loader-1",
-          "$ts-loader-2"
-      ],
-      "detail": "Package extension to file {name}-{version}.vsix to directory defined with environment variable PACKAGE_OUT_DIR",
-      "group": "build",
-      "options":
-      {
-        "statusbar":
-        {
-          "filePattern": ".*",
-          "label": "〈 Package .vsix 〉",
-          "hide": false
-        }
-      },
-      "dependsOn":
-      [
-        "build:package:check-deps",
-        "build:package:validate-build-dir"
-      ],
-      "dependsOrder": "sequence",
-      "presentation": {
-        "echo":             true,
-        "reveal":           "always",
-        "focus":            false,
-        "panel":            "shared",
-        "showReuseMessage": true,
-        "clear":            false,
-        "group":            "build",
-        "revealProblems":   "onProblem",
-      }
-  },
-  {   // Check this actually works lol
-      "type": "shell",
-      "label": "build:package:check-deps",
-      "command": "command -v shx jq vsce",
-      "detail": "Check for required commands on PATH before running packaging tasks",
-      "group": "build",
-      "options":
-      {
-        "statusbar":
-        {
-          "hide": true
+    {
+        "type": "yarn",
+        "task": "compile:watch",
+        "label": "watch",
+        "options": {
+            "cwd": "${workspaceFolder}",
+            "statusbar": {
+                "label": "｢ Watch ｣",
+                "hide": false
+            }
         },
-      },
-      "isBackground": true,
-      "presentation": {
-        "echo":             false,
-        "reveal":           "silent",
-        "focus":            false,
-        "panel":            "shared",
-        "showReuseMessage": false,
-        "clear":            false,
-        "group":            "build",
-        "revealProblems":   "onProblem",
-      }
-  },
-  {   // Check this actually works lol
-      "type": "shell",
-      "label": "build:package:validate-build-dir",
-      "command": "mkdir -v -p \"${PACKAGE_OUT_DIR}\"",
-      "detail": "Check if build output directory exists, and create if needed",
-      "group": "build",
-      "options":
-      {
-        "statusbar":
-        {
-          "hide": true
+        "isBackground": true,
+        "runOptions": {
+            "runOn": "folderOpen",
+            "instanceLimit": 1
         },
-      },
-      "isBackground": true,
-      "presentation": {
-        "echo":             true,
-        "reveal":           "always",
-        "focus":            false,
-        "panel":            "shared",
-        "showReuseMessage": false,
-        "clear":            false,
-        "group":            "build",
-        "revealProblems":   "onProblem",
-      }
-  }
-  ]
+        "problemMatcher": [
+            "$tsc",
+            "$tsc-watch",
+
+            "$ts-webpack",
+            "$ts-webpack-watch",
+
+            "$ts-loader-1",
+            "$ts-loader-2"
+        ],
+        "presentation": {
+            "reveal": "silent",
+            "clear": false,
+            "echo": true,
+            "focus": false,
+            "group": "build",
+            "panel": "dedicated",
+            "revealProblems": "onProblem",
+            "showReuseMessage": false
+        },
+        "group": {
+            "kind": "build",
+            "isDefault": true
+        }
+    },
+    {
+        "type": "yarn",
+        "task": "compile:development",
+        "label": "compile",
+        "options": {
+            "statusbar": {
+                "label": "｢ Build ｣",
+                "hide": false
+            }
+        },
+        "problemMatcher": [
+            "$tsc",
+            // "$tsc-watch",
+
+            "$ts-webpack",
+            // "$ts-webpack-watch",
+
+            "$ts-loader-1",
+            "$ts-loader-2",
+
+            "$tslint-webpack",
+            // "$tslint-webpack-watch"
+        ],
+        "presentation": {
+            "reveal": "never",
+            "clear": false,
+            "echo": true,
+            "focus": false,
+            "group": "build",
+            "panel": "dedicated",
+            "revealProblems": "never",
+            "showReuseMessage": false
+        },
+        "group": "build"
+        // }
+    },
+    {
+        "type": "yarn",
+        "task": "compile:release",
+        "label": "compile:release",
+        "options": {
+            "statusbar": {
+                "hide": true
+            }
+        },
+        "problemMatcher": [
+            "$tsc",
+            // "$tsc-watch",
+
+            "$ts-webpack",
+            // "$ts-webpack-watch",
+
+            "$ts-loader-1",
+            "$ts-loader-2",
+
+            "$tslint-webpack",
+            // "$tslint-webpack-watch"
+        ],
+        "runOptions": {
+            "instanceLimit": 1,
+            "reevaluateOnRerun": true
+        },
+        "presentation": {
+            "reveal": "never",
+            "clear": false,
+            "echo": true,
+            "focus": false,
+            "group": "build",
+            "panel": "dedicated",
+            "revealProblems": "never",
+            "showReuseMessage": false
+        },
+        "group": "build"
+    },
+    {
+        "type": "yarn",
+        "task": "vsix",
+        "label": "Build .vsix",
+        "problemMatcher": [
+            "$tsc",
+            // "$tsc-watch",
+
+            "$ts-webpack",
+            // "$ts-webpack-watch",
+
+            "$ts-loader-1",
+            "$ts-loader-2",
+
+            "$tslint-webpack",
+            // "$tslint-webpack-watch"
+        ],
+        "detail": "Package extension to file {name}-{version}.vsix to directory defined with environment variable PACKAGE_OUT_DIR",
+        "group": "build",
+        "options": {
+            "statusbar": {
+                "filePattern": ".*",
+                "label": "｢ Package .vsix ｣",
+                "hide": false
+            }
+        },
+        "dependsOn": [
+            "build:package:check-deps",
+            "build:package:validate-build-dir"
+        ],
+        "dependsOrder": "sequence",
+        "presentation": {
+            "echo": true,
+            "reveal": "always",
+            "focus": false,
+            "panel": "shared",
+            "showReuseMessage": true,
+            "clear": false,
+            "group": "build",
+            "revealProblems": "onProblem"
+        }
+    },
+    {
+        "type": "shell",
+        "label": "build:package:check-deps",
+        "command": "command -v shx rimraf jq vsce",
+        "detail": "Check for required commands on PATH before running packaging tasks",
+        "group": "build",
+        "options": {
+            "statusbar": {
+                "hide": true
+            }
+        },
+        "isBackground": true,
+        "presentation": {
+            "echo": false,
+            "reveal": "silent",
+            "focus": false,
+            "panel": "shared",
+            "showReuseMessage": false,
+            "clear": false,
+            "group": "build",
+            "revealProblems": "onProblem"
+        }
+    },
+    {
+        "type": "shell",
+        "label": "build:package:validate-build-dir",
+        "command": "mkdir -v -p \"${PACKAGE_OUT_DIR}\"",
+        "detail": "Check if build output directory exists, and create if needed",
+        "group": "build",
+        "options": {
+            "statusbar": {
+                "hide": true
+            }
+        },
+        "isBackground": true,
+        "presentation": {
+            "echo": true,
+            "reveal": "always",
+            "focus": false,
+            "panel": "shared",
+            "showReuseMessage": false,
+            "clear": false,
+            "group": "build",
+            "revealProblems": "onProblem"
+        }
+    },
+    {
+        "type": "yarn",
+        "task": "compile",
+        "problemMatcher": [
+            "$ts-loader-1"
+        ],
+        "label": "yarn: compile"
+    }
+]
 }

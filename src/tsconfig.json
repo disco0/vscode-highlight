@@ -1,13 +1,15 @@
 {
+  "include": ["./globals.d.ts", "."],
   "compilerOptions": {
     "module": "commonjs",
     "target": "ES2019",
     "outDir": "../out",
     "sourceMap": true,
     "rootDir": ".",
-    "baseUrl": "./",
+    "baseUrl": ".",
     "strict": true,
     "strictNullChecks": true,
+    "moduleResolution": "Node",
 
     /**
      * Per advice under `If you are using TypeScript >= 3.8.0` at
@@ -17,7 +19,7 @@
 
     "lib":
     [
-      "ES2019.Array"
+        "ES2019.Array"
     ],
 
     "typeRoots": [

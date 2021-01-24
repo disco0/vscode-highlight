@@ -2,8 +2,8 @@
   "extends": "../tsconfig.ts-node.base.json",
   "include":
   [
-      "../schema.d.ts",
-      "./*.*"
+      "schema.ts",
+      "."
   ],
   "exclude":
   [
@@ -14,6 +14,8 @@
   {
     "skipLibCheck": true,
     "moduleResolution": "Node",
+    "types": ["node"],
     "module": "commonjs",
+    "noEmit": true
   }
 }

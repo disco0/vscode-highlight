@@ -1,0 +1,9 @@
+{
+  "recommendations":
+  [
+    "eamodio.tsl-problem-matcher",
+    "zokugun.explicit-folding"
+  ]
+}
+
+// code: language=jsonc insertSpaces=true tabSize=2

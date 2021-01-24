@@ -1,34 +1,60 @@
 {
-  "highlight.regexes":
-  {
-      "^([\\/][\\*])([ ]+)()([\\S].*?)([ ]+)([\\*][\\/])$":
+  "yarn.tasks.debug": false,
+  "tasks.statusbar.default.hide": false,
+  "javascript.suggest.autoImports": false,
+  "folding": {
+    "typescript": [
       {
-          "filterLanguageRegex": "(java|type)script",
-          "regexFlags": "gmi",
-          "decorations":
-          [
-            {
-              "color": "#A00"
-            },
-            { },
-            {
-              "isWholeLine": true,
-              "backgroundColor": "#00FFFF03",
-              // "textDecoration": "; box-shadow: 0 0.09em 0 0 #C00",
-              "borderColor": "#AA000040",
-              "borderStyle": "solid",
-              "borderWidth": "0 0 0.125em 0"
-            },
-            {
-              "color": "#A00",
-              "fontWeight": "600"
-            },
-            { },
-            {
-              "color": "#A00",
-              "fontWeight": "600"
-            },
-          ]
+        "separatorRegex": "[\\/][\\*] +[A-Z]+(?:[A-Z]+|[A-Z:_\\-]+) +[\\*][\\/]",
+        "foldLastLine": false,
+        "kind": "region",
+        "nested": true
       }
-  }
+    ]
+  },
+  "highlight.regexes": {
+    "(\\/\\/[ ]+)(@ts-expect-error)(?:([ ]+)(\\S.+)([ ]*))?$":
+    {
+      "filterLanguageRegex": "(java|type)script",
+      "regexFlags": "gm",
+      "decorations":
+      [
+        { },
+        { "color": "#C08", "fontWeight": "500", "fontStyle": "unset" },
+        { },
+        { "color": "#04CC", "fontStyle": "unset" }
+      ]
+    },
+    "^(?:([ ]+)|(?=\\/)())([\\/][\\*])([ ]+)([\\S].*?)([ ]+)([\\*][\\/])$": {
+      "filterLanguageRegex": "(java|type)script",
+      "regexFlags": "gmi",
+      "decorations": [
+        { },
+        {
+          "isWholeLine": true,
+          // "backgroundColor": "#00FFFF03",
+          // "textDecoration": "; box-shadow: 0 0.09em 0 0 #C00",
+          "borderColor": "#AA000040",
+          "borderStyle": "solid",
+          "borderWidth": "0 0 0.125em 0"
+        },
+        { "color": "#B00" },
+        { },
+        {
+          "color": "#B00",
+          "fontWeight": "600"
+        },
+        { },
+        {
+          "color": "#B00",
+          "fontWeight": "600"
+        }
+      ]
+    },
+  },
+  "search.exclude": {
+    "**/.yarn": true,
+    "**/.pnp.*": true
+},
+"typescript.tsdk": "node_modules/typescript/lib"
 }

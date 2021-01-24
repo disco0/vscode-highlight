@@ -10,7 +10,13 @@ import fs   = require('fs');
 import path = require('path');
 import os   = require('os');
 
-import { ConfigurationSchema } from 'vscode-contribution-schema';
+import {
+  ConfigurationSettingSchema,
+  ConfigurationSchema
+} from 'vscode-contribution-schema';
+import { OverwriteProps } from 'tsdef'
+
+import { configurationSchema } from './schema/config'
 
 //#endregion Imports
 
@@ -20,15 +26,15 @@ const basePath = path.resolve(__dirname, '../');
 const packageJsonPath = path.resolve(basePath, 'package.json');
 const newSchemaPath = path.resolve(basePath, 'src/schema.json');
 
-// const newSchema: ConfigurationSchema = require('../src/schema.json')
-
 //#endregion Configuration
 
-updateSchema()
+updateSchema(configurationSchema)
 
 //#region Implementation
 
-function updateSchema(schemaPath: string = newSchemaPath, packagePath: string = packageJsonPath)
+function updateSchema(schemaPath?: string, packagePath?: string);
+function updateSchema(schemaPath?: ConfigurationSchema, packagePath?: string);
+function updateSchema(schemaPath: ConfigurationSchema | string = newSchemaPath, packagePath: string = packageJsonPath)
 {
     //#region Validate paths
 
@@ -38,7 +44,7 @@ function updateSchema(schemaPath: string = newSchemaPath, packagePath: string = 
         return
     }
 
-    if(!(fs.existsSync(schemaPath)))
+    if(typeof schemaPath === 'string' && !(fs.existsSync(schemaPath)))
     {
         console.error(`Reference schema data file not found at path: ${schemaPath}.`)
         return
@@ -49,50 +55,64 @@ function updateSchema(schemaPath: string = newSchemaPath, packagePath: string = 
     //#region Import and backup current package data
 
     console.log(`Importing package.json data from ${packagePath}`)
+    const pkg = require(packagePath) as ExtensionPackageJSON;
 
-    const pkg = require(packagePath) as NpmPackageFile;
-
-    const backupPackageJSONPath = path.resolve(os.tmpdir(), `package.json`)
+    const backupPackageJSONPath =
+        path.resolve( os.tmpdir(),
+                      `${(({name}) => name ? (name + "-") : "" )(pkg)}package.json`);
 
     console.log(`Backing up existing package.json data to ${backupPackageJSONPath}`)
-
     fs.writeFileSync( backupPackageJSONPath, JSON.stringify(pkg, null, 4), 'utf-8' )
 
     //#endregion Import and backup current package data
 
     //#region Import and validate new configuration schema
 
-    // @TODO(disk0): Interface directly with schema build here
+    let configSchema: ConfigurationSchema | undefined;
 
-    // Having to get configuration object through a couple properties is due to
-    // how schema builder generates schema—needing to jump through a couple hoops
-    // might be good as an idiot check before writing the wrong thing in the wrong place
-    // on accident
+    //#region Configuration From Argument
 
-    const configSchema = (require(schemaPath)?.contributes?.configuration ?? undefined) as ConfigurationSchema | undefined
-
-    if(!configSchema)
+    if(typeof schemaPath === 'object')
     {
-        throw new Error(
-          `Configuration property does not exist in schema data file.\n  Loaded JSON:\n${
-              JSON.stringify(configSchema, null, 4)
-          }`);
+        configSchema = schemaPath
     }
+
+    //#endregion Configuration From Argument
+
+    else
+
+    //#region Configuration Path From Argument
+
+    {
+      // Having to get configuration object through a couple properties is due to
+      // how schema builder generates schema—needing to jump through a couple hoops
+      // might be good as an idiot check before writing the wrong thing in the wrong place
+      // on accident.
+
+        configSchema = (require(schemaPath)?.contributes?.configuration ?? undefined)
+
+        if(!configSchema)
+            throw new Error(
+                `Configuration property does not exist in schema data file.\n  Loaded JSON:\n${
+                JSON.stringify(configSchema, null, 4)
+            }`);
+    }
+
+    //#endregion Configuration Path From Argument
 
     //#endregion Import and validate new configuration schema
 
     //#region Update contributes.configuration value
 
-    // This feels too easy, if this doesn't work check here
-    const newPackageJsonData =
+    const newPackageJsonData: ExtensionPackageJSON =
     {
-      ...pkg,
-      contributes:
-      {
-          ...pkg.contributes,
-          configuration: configSchema
-      }
-    } as NpmPackageFile
+        ...pkg,
+        contributes:
+        {
+            ...pkg.contributes,
+            configuration: configSchema
+        }
+    }
 
     //#endregion Update contributes.configuration value
 
@@ -106,6 +126,10 @@ function updateSchema(schemaPath: string = newSchemaPath, packagePath: string = 
 //#region Types
 
 // Just reflect shape directly instead of interface
-type NpmPackageFile = typeof import('../package.json')
+type ExtensionPackageJSON = OverwriteProps<
+    typeof import('../package.json'),
+    { contributes: { configuration: ConfigurationSchema } }
+    // Record<'contributes', Record<'configuration', ConfigurationSchema>>
+>
 
 //#endregion Types

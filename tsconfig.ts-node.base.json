@@ -1,0 +1,21 @@
+{
+  /**
+   * Base configuration for ts-node targeted sources
+   */
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+
+    "checkJs": false,
+
+    "esModuleInterop": true,
+
+    "typeRoots": [ "./node_modules/@types"  ],
+    "types": [ "node" ],
+
+    "resolveJsonModule": true,
+
+    // Disable compilation
+    "noEmit": true,
+  }
+}

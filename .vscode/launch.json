@@ -1,24 +1,33 @@
 {
     "configurations": [
     {
-      "name": "Extension",
+      "name": "Extension - Development",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
+      "skipFiles": ["/Applications/**", "**/.vscode-insiders/**"],
       "args": [
           // Disable installed versions of extension
           "--disable-extension=disk0.vscode-highlight",
           "--disable-extension=fabiospampinato.vscode-highlight",
 
           "--extensionDevelopmentPath=${workspaceFolder}",
+
+          // Open test workspace
+          "--folder-uri=${workspaceFolder}/test/workspace",
+          //    and test file
+          "--file-uri=${workspaceFolder}/test/workspace/file.js"
       ],
       "outFiles": [ "${workspaceFolder}/dist/**/*.js" ],
+      "sourceMaps": true,
+      "internalConsoleOptions": "openOnFirstSessionStart",
       "presentation": {
         "hidden": false,
         "group": "start",
         "order": 1
       },
-      "preLaunchTask": "compile"
+      "trace": "verbose",
+      "preLaunchTask": "${defaultBuildTask}"
     },
     {
       "name": "Extension - Release",
@@ -33,6 +42,7 @@
           "--extensionDevelopmentPath=${workspaceFolder}",
       ],
       "outFiles": [ "${workspaceFolder}/dist/**/*.js" ],
+      "sourceMaps": true,
       "presentation": {
         "hidden": false,
         "group": "start",

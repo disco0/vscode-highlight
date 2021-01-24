@@ -1,3 +1,8 @@
+### Version 1.4.2
+- Added schema for extension configuration—all properties, including decoration objects' properties, and their nested values, should now have completions when configuring highlights:
+
+  ![](./resources/CHANGELOG-1.4.3-Demo-Configuration.png)
+
 ### Version 1.4.1
 - Ensuring types generated from dynamic decorators are cleared up properly
 

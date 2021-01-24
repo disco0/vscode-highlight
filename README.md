@@ -238,6 +238,10 @@ If you found a problem, or have a feature request, please open an [issue](https:
 
 If you want to make a pull request you can debug the extension using [Debug Launcher](https://marketplace.visualstudio.com/items?itemName=fabiospampinato.vscode-debug-launcher).
 
+### Building
+
+As of `1.4.2`, Highlight's configuration contribution schema is large enough to break building with `npm`—unfortunately this be a problem until schema references can be used in extension configuration schemas. Until then, vsce should be called with the `--yarn` flag.
+
 ## License
 
 MIT © Fabio Spampinato

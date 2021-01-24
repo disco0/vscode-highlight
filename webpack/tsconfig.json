@@ -1,5 +1,4 @@
 {
-    "extends": "../tsconfig.ts-node.base.json",
     "files":
     [
         "webpack.config.ts"
@@ -16,6 +15,18 @@
       "typeRoots": ["../node_modules/@types"],
       "moduleResolution": "Node",
       "skipLibCheck": true,
-      "types": ["node", "webpack"]
+      "types": ["node", "webpack"],
+
+      "module": "commonjs",
+      "target": "es5",
+
+      "checkJs": false,
+
+      "esModuleInterop": true,
+
+      "resolveJsonModule": true,
+
+      // Disable compilation
+      "noEmit": true,
     }
 }
