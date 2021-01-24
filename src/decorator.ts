@@ -6,24 +6,27 @@
 
 /* DECLARATIONS */
 
-type EditorId = number | string;
+type EditorId = string;
+
+/**
+ * Extends dejure `TextEditor` interface with private `id` property.
+ */
 interface TextEditorWithId extends vscode.TextEditor
 {
-    id: EditorId
+    id: EditorId;
 }
+
+type EditorDecorationMap = Record<EditorId, ItemOrItems<Range>>;
+// Map<EditorId, ItemOrItems<Range>> //  Map<EditorId, Config.Configuration | vscode.TextEditorEdit>
 
 /* IMPORT */
 
 import * as _ from 'lodash';
 import stringMatches from 'string-matches';
 import * as vscode from 'vscode';
-import Config from './config';
-import type {
-  Configuration,
-  HighlightDecoration,
-  HighlightRegexConfiguration
-} from './config';
+import type { Range } from 'vscode';
 import Utils from './utils';
+import Config from './config';
 
 /* DECORATOR */
 
@@ -41,18 +44,18 @@ const Decorator = {
 
   /* CONFIG */
 
-  config: undefined! as Configuration,
+  config: undefined! as Config.Configuration,
 
   initConfig () {
 
-    Decorator.config = Config.get ()!;
+    Decorator.config = Config.get()!;
 
   },
 
   /* REGEXES */
 
   regexesStrs: undefined! as string[],
-  regexes: undefined! as _.Dictionary<RegExp>,
+  regexes:     undefined! as _.Dictionary<RegExp>,
 
   initRegexes () {
 
@@ -78,7 +81,7 @@ const Decorator = {
 
   /* TYPES */
 
-  types: [] as _.Dictionary<any>,
+  types: {} as _.Dictionary<any>,
   typesDynamic: [] as vscode.TextEditorDecorationType[],
 
   initTypes () {
@@ -94,13 +97,13 @@ const Decorator = {
             return reDecorations.map ( options => {
 
               const decorationsFull = _.merge ( {}, decorations, options ),
-                    decorationsStr = JSON.stringify ( decorationsFull );
+                    decorationsStr  = JSON.stringify ( decorationsFull );
 
               if ( /\$\d/.test ( decorationsStr ) ) { // Dynamic decorator
                 const regexExecToDecorationMemoizer = (match: RegExpExecArray) => {
 
                   const decorationsStrReplaced = decorationsStr.replace ( /\$(\d)/g, ( m, index ) => match[index] ),
-                        decorationsFullReplaced = JSON.parse ( decorationsStrReplaced );
+                        decorationsFullReplaced = JSON.parse ( decorationsStrReplaced ) as vscode.DecorationRenderOptions;
 
                   const type = vscode.window.createTextEditorDecorationType ( decorationsFullReplaced );
 
@@ -140,37 +143,43 @@ const Decorator = {
 
   /* DECORATIONS */
 
-  decorations: {} as Map<EditorId, Configuration>, // Map of document id => decorations
+  decorations: {} as EditorDecorationMap, // Map of document id => decorations
 
   decorate ( target?: vscode.TextEditor | vscode.TextDocument, force?: boolean ) : void
   {
 
     if ( !target ) {
 
+      console.debug(`[Decorate] No input editor object.`)
+
       const textEditor = vscode.window.activeTextEditor;
 
       if ( !textEditor ) return;
 
+      console.debug(`[Decorate] Calling with active document editor object.`)
       return Decorator.decorate ( textEditor, force );
 
     }
 
     if ( !Utils.editor.is ( target ) ) {
+      console.debug(`[Decorate] Input is not editor => document`)
 
       const textEditors = Utils.document.getEditors ( target );
 
+      console.debug(`[Decorate] Recursively calling decorate with ${textEditors.length} matching editors`)
       return textEditors.forEach ( textEditor => Decorator.decorate ( textEditor, force ) );
 
     }
 
-    const textEditor = target as TextEditorWithId,
-          doc = target.document,
-          text = doc.getText (),
-          decorations = new Map ();
+    const textEditor  = target as TextEditorWithId,
+          doc         = target.document,
+          text        = doc.getText (),
+          decorations = new Map() as EditorDecorationMap;
 
     /* PARSING */
 
     Decorator.regexesStrs.forEach ( reStr => {
+      console.debug(`[Decorate] Processing configuration regexp: /${reStr}/`)
 
       const options = Decorator.config.regexes[reStr],
             isFiltered = Utils.document.isFiltered ( doc, options );
@@ -263,20 +272,24 @@ const Decorator = {
     // 2. There were no decorations in lineNrs
     // 3. There still are no decorations in lineNrs
 
-    const textEditor = Utils.document.getEditors ( doc )[0] as TextEditorWithId;
+    const textEditor = Utils.document.getEditors ( doc )[0] as TextEditorWithId | undefined
 
     if ( textEditor && Decorator.docsLines[textEditor['id']] === doc.lineCount ) {
 
-      // @ts-expect-error ts(7052) Element implicitly has an 'any' type because type 'Map<EditorId, Configuration>' has no index signature. Did you mean to call 'Decorator.decorations.get'?
-      const decorations = Decorator.decorations[textEditor['id']] as HighlightRegexConfiguration['decorations'][]
+        // @ts-expect-error ts(7052)
+      const decorations = (Decorator.decorations[textEditor.id] || []) as Config.HighlightRegexConfiguration['decorations'][]
 
       let hadDecorations = false;
 
       if ( decorations ) {
 
-        for ( let ranges of decorations.values () ) {
+        for ( let ranges of (decorations.values () as unknown) as [vscode.Range[]] ) {
 
-          if ( ranges!.find ( range => _.includes ( lineNrs, range.start.line ) || _.includes ( lineNrs, range.end.line ) ) ) {
+          if (ranges && (ranges).find (
+              (range) =>
+                  _.includes ( lineNrs, range.start.line ) ||
+                  _.includes ( lineNrs, range.end.line ) )
+          ) {
 
             hadDecorations = true;
 
