@@ -58,8 +58,7 @@ function updateSchema(schemaPath: ConfigurationSchema | string = newSchemaPath, 
     const pkg = require(packagePath) as ExtensionPackageJSON;
 
     const backupPackageJSONPath =
-        path.resolve( os.tmpdir(),
-                      `${(({name}) => name ? (name + "-") : "" )(pkg)}package.json`);
+        path.resolve(os.tmpdir(), `${(({name}) => name ? (name + "-") : "" )(pkg)}package.json`);
 
     console.log(`Backing up existing package.json data to ${backupPackageJSONPath}`)
     fs.writeFileSync( backupPackageJSONPath, JSON.stringify(pkg, null, 4), 'utf-8' )
